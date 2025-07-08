@@ -6,4 +6,7 @@ public class BudgetAllocationEntity
     public Guid CategoryId { get; set; }
     public Guid? SubCategoryId { get; set; }
     public decimal Amount { get; set; } = 0;
+    public BudgetEntity Budget { get; set; }
+    public CategoryEntity Category { get; set; }
+    public SubCategoryEntity? SubCategory { get; set; }
 }
