@@ -10,4 +10,9 @@
     <ProjectReference Include="..\TicketsManager.Common\TicketsManager.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="SecurityService\" />
+    <Folder Include="UserManagement\" />
+  </ItemGroup>
+
 </Project>
