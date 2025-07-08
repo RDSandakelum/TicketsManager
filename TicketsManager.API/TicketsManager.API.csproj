@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\TicketsManager.Business\TicketsManager.Business.csproj" />
     <ProjectReference Include="..\TicketsManager.Common\TicketsManager.Common.csproj" />
+    <ProjectReference Include="..\TicketsManager.DataAccess\TicketsManager.DataAccess.csproj" />
   </ItemGroup>
 
 </Project>
