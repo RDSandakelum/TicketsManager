@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="EntityConfigurations\" />
+    <Folder Include="EFCustomizations\" />
   </ItemGroup>
 
 </Project>
