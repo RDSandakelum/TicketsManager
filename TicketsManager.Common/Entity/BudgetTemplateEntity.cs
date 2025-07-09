@@ -9,5 +9,5 @@ public class BudgetTemplateEntity
     public string TemplateName { get; set; }
     public Guid UserId { get; set; }
     public ICollection<CategoryEntity> Categories { get; set; }
-    public ICollection<UserEntity> User { get; set; }
+    public UserEntity User { get; set; }
 }
