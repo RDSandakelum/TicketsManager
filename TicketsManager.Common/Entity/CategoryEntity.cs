@@ -13,5 +13,4 @@ public class CategoryEntity
     public Guid BudgetTemplateId { get; set; }
     public ICollection<SubCategoryEntity> SubCategories { get; set; }
     public BudgetTemplateEntity BudgetTemplate { get; set; }
-    public ICollection<ExpenseEntity> Expenses { get; set; }
 }

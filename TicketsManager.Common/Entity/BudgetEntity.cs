@@ -11,6 +11,7 @@ public class BudgetEntity
     public DateTimeOffset StartDate { get; set; }
     public DateTimeOffset EndDate { get; set; }
     public Guid UserId { get; set; }
+    public Guid BudgetTemplateId { get; set; }
     public UserEntity User { get; set; }
     public BudgetTemplateEntity BudgetTemplate { get; set; }
     public ICollection<BudgetAllocationEntity> BudgetAllocations { get; set; } 
