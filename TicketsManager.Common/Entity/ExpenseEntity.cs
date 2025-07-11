@@ -9,6 +9,8 @@ public class ExpenseEntity
     public Guid BudgetId { get; set; }
     public Guid? CategoryId { get; set; }
     public Guid? SubCategoryId { get; set; }
+    public Guid UserId { get; set; }
+    public UserEntity User { get; set; }
     public BudgetEntity Budget { get; set; }
     public CategoryEntity? Category { get; set; }
     public SubCategoryEntity? SubCategory { get; set; }
