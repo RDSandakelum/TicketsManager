@@ -59,6 +59,6 @@ internal class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
         builder.HasMany(u => u.Expenses)
             .WithOne(e => e.User)
             .HasForeignKey(e => e.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

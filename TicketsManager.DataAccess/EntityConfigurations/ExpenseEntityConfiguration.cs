@@ -30,7 +30,7 @@ namespace TicketsManager.DataAccess.EntityConfigurations
             builder.HasOne(e => e.User)
                 .WithMany(u => u.Expenses)
                 .HasForeignKey(e => e.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(e => e.Budget)
                 .WithMany(b => b.BudgetExpenses)

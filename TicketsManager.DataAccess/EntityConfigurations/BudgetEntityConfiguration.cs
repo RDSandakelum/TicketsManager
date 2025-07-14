@@ -27,7 +27,7 @@ namespace TicketsManager.DataAccess.EntityConfigurations
             builder.HasOne(b => b.BudgetTemplate)
                 .WithMany(bt => bt.Budgets)
                 .HasForeignKey(b => b.BudgetTemplateId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasMany(b => b.BudgetAllocations)
                 .WithOne(ba => ba.Budget)
