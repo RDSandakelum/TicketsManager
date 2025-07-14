@@ -7,6 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="SecurityService\**" />
+    <Compile Remove="UserManagement\**" />
+    <EmbeddedResource Remove="SecurityService\**" />
+    <EmbeddedResource Remove="UserManagement\**" />
+    <None Remove="SecurityService\**" />
+    <None Remove="UserManagement\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TicketsManager.Common\TicketsManager.Common.csproj" />
   </ItemGroup>
 
