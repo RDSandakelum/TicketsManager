@@ -5,9 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TicketsManager.Common.Entity;
+using TicketsManager.Common.Database;
 
-namespace TicketsManager.DataAccess.TicketsManagerDBContext;
-public class TicketsManagerDbContext : DbContext
+namespace TicketsManager.DataAccess.EFCustomizations;
+public partial class TicketsManagerDbContext : DbContext, ITicketsManagerDbContext
 {
     public TicketsManagerDbContext(DbContextOptions<TicketsManagerDbContext> options) : base(options)
     {
@@ -19,6 +20,11 @@ public class TicketsManagerDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(TicketsManagerDbContext).Assembly);
+    }
+
+    public Task<bool> SaveChangesAsync()
+    {
+        return Task.FromResult(true);
     }
 
     public DbSet<UserEntity> UserEntities { get; set; }
