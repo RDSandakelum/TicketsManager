@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using TicketsManager.DataAccess.TicketsManagerDBContext;
+using TicketsManager.DataAccess.EFCustomizations;
 
 var builder = WebApplication.CreateBuilder(args);
 
