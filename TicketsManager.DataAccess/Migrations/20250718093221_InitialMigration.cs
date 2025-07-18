@@ -12,7 +12,7 @@ namespace TicketsManager.DataAccess.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "UserEntities",
+                name: "Users",
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -27,7 +27,7 @@ namespace TicketsManager.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserEntities", x => x.UserId);
+                    table.PrimaryKey("PK_Users", x => x.UserId);
                 });
 
             migrationBuilder.CreateTable(
@@ -42,9 +42,9 @@ namespace TicketsManager.DataAccess.Migrations
                 {
                     table.PrimaryKey("PK_BudgetTemplates", x => x.TemplateId);
                     table.ForeignKey(
-                        name: "FK_BudgetTemplates_UserEntities_UserId",
+                        name: "FK_BudgetTemplates_Users_UserId",
                         column: x => x.UserId,
-                        principalTable: "UserEntities",
+                        principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -70,9 +70,9 @@ namespace TicketsManager.DataAccess.Migrations
                         principalColumn: "TemplateId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Budgets_UserEntities_UserId",
+                        name: "FK_Budgets_Users_UserId",
                         column: x => x.UserId,
-                        principalTable: "UserEntities",
+                        principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -186,9 +186,9 @@ namespace TicketsManager.DataAccess.Migrations
                         principalColumn: "SubCategoryId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Expenses_UserEntities_UserId",
+                        name: "FK_Expenses_Users_UserId",
                         column: x => x.UserId,
-                        principalTable: "UserEntities",
+                        principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -256,14 +256,14 @@ namespace TicketsManager.DataAccess.Migrations
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserEntities_NormalizedEmail",
-                table: "UserEntities",
+                name: "IX_Users_NormalizedEmail",
+                table: "Users",
                 column: "NormalizedEmail",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserEntities_NormalizedUsername",
-                table: "UserEntities",
+                name: "IX_Users_NormalizedUsername",
+                table: "Users",
                 column: "NormalizedUsername",
                 unique: true);
         }
@@ -290,7 +290,7 @@ namespace TicketsManager.DataAccess.Migrations
                 name: "BudgetTemplates");
 
             migrationBuilder.DropTable(
-                name: "UserEntities");
+                name: "Users");
         }
     }
 }

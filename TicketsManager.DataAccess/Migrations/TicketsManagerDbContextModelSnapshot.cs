@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TicketsManager.DataAccess.EFCustomizations;
 
-
 #nullable disable
 
 namespace TicketsManager.DataAccess.Migrations
@@ -256,7 +255,7 @@ namespace TicketsManager.DataAccess.Migrations
                     b.HasIndex("NormalizedUsername")
                         .IsUnique();
 
-                    b.ToTable("UserEntities");
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("TicketsManager.Common.Entity.BudgetAllocationEntity", b =>

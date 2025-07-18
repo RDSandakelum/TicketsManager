@@ -10,10 +10,7 @@ using TicketsManager.Common.Database;
 namespace TicketsManager.DataAccess.EFCustomizations;
 public partial class TicketsManagerDbContext : DbContext, ITicketsManagerDbContext
 {
-    public TicketsManagerDbContext(DbContextOptions<TicketsManagerDbContext> options) : base(options)
-    {
-
-    }
+    public TicketsManagerDbContext(DbContextOptions<TicketsManagerDbContext> options) : base(options){}
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -22,17 +19,25 @@ public partial class TicketsManagerDbContext : DbContext, ITicketsManagerDbConte
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(TicketsManagerDbContext).Assembly);
     }
 
-    public Task<bool> SaveChangesAsync()
+    public async Task<int> SaveChangesAsync()
     {
-        return Task.FromResult(true);
+        try
+        {
+            return await base.SaveChangesAsync();
+        }
+        catch
+        {
+            //Log the exception or handle it as needed
+            throw;
+        }
+        
     }
 
-    public DbSet<UserEntity> UserEntities { get; set; }
-    public DbSet<BudgetTemplateEntity> BudgetTemplates { get; set; }
-    public DbSet<BudgetEntity> Budgets { get; set; }
-    public DbSet<CategoryEntity> Categories { get; set; }
-    public DbSet<SubCategoryEntity> SubCategories { get; set; }
-    public DbSet<BudgetAllocationEntity> BudgetAllocations { get; set; }
-    public DbSet<ExpenseEntity> Expenses { get; set; }
-
+    public virtual DbSet<UserEntity> Users { get; set; }
+    public virtual DbSet<BudgetTemplateEntity> BudgetTemplates { get; set; }
+    public virtual DbSet<BudgetEntity> Budgets { get; set; }
+    public virtual DbSet<CategoryEntity> Categories { get; set; }
+    public virtual DbSet<SubCategoryEntity> SubCategories { get; set; }
+    public virtual DbSet<BudgetAllocationEntity> BudgetAllocations { get; set; }
+    public virtual DbSet<ExpenseEntity> Expenses { get; set; }
 }
