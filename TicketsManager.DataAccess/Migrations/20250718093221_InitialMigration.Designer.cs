@@ -7,13 +7,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TicketsManager.DataAccess.EFCustomizations;
 
-
 #nullable disable
 
 namespace TicketsManager.DataAccess.Migrations
 {
     [DbContext(typeof(TicketsManagerDbContext))]
-    [Migration("20250714093406_InitialMigration")]
+    [Migration("20250718093221_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -259,7 +258,7 @@ namespace TicketsManager.DataAccess.Migrations
                     b.HasIndex("NormalizedUsername")
                         .IsUnique();
 
-                    b.ToTable("UserEntities");
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("TicketsManager.Common.Entity.BudgetAllocationEntity", b =>
