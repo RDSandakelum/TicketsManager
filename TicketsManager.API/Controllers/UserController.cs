@@ -32,4 +32,19 @@ public class UserController : ControllerBase
 
         return Ok(createdUser.User);
     }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> LoginUser([FromBody] LoginUserRequest request)
+    {
+        var loginResponse = await mediator.Send(new LoginUserCommand
+        {
+            Username = request.Username,
+            Password = request.Password
+        });
+        if (loginResponse == null)
+        {
+            return Unauthorized();
+        }
+        return Ok(loginResponse.User);
+    }
 }
