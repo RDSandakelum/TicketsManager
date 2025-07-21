@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TicketsManager.Business.Actions.Users;
+using TicketsManager.Business.MappingConfig;
 using TicketsManager.Common.Database;
 using TicketsManager.Common.Services;
 using TicketsManager.Common.Services.Definitions;
@@ -17,6 +18,11 @@ services.AddDbContext<TicketsManagerDbContext>(options =>
 });
 
 services.AddScoped<ITicketsManagerDbContext, TicketsManagerDbContext>();
+
+services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile<MappingConfigurations>();
+});
 
 services.AddMediatR(configurations =>
 {

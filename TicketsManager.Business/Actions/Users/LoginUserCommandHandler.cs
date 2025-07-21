@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
 using TicketsManager.Business.Repository;
 using TicketsManager.Common.Database;
 using TicketsManager.Common.Dto;
@@ -20,9 +21,11 @@ namespace TicketsManager.Business.Actions.Users
     public class LoginUserCommandHandler : RepositoryAccess,IRequestHandler<LoginUserCommand, LoginUserCommandResponse>
     {
         private readonly IPasswordService passwordService;
-        public LoginUserCommandHandler(ITicketsManagerDbContext ticketsManagerDbContext, IPasswordService passwordService) : base(ticketsManagerDbContext)
+        private readonly IMapper mapper;
+        public LoginUserCommandHandler(ITicketsManagerDbContext ticketsManagerDbContext, IPasswordService passwordService, IMapper mapper) : base(ticketsManagerDbContext)
         {
             this.passwordService = passwordService;
+            this.mapper = mapper;
         }
         public async Task<LoginUserCommandResponse> Handle(LoginUserCommand request, CancellationToken cancellationToken)
         {
@@ -39,14 +42,7 @@ namespace TicketsManager.Business.Actions.Users
             {
                 return new LoginUserCommandResponse()
                 {
-                    User = new UserDto()
-                    {
-                        UserId = existingUser.UserId,
-                        FirstName = existingUser.FirstName,
-                        LastName = existingUser.LastName,
-                        Username = existingUser.Username,
-                        Email = existingUser.Email
-                    }
+                    User = mapper.Map<UserDto>(existingUser)
                 };
             }
 

@@ -36,7 +36,7 @@ public class UserController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> LoginUser([FromBody] LoginUserRequest request)
     {
-        var loginResponse = await mediator.Send(new LoginUserCommand
+        var loginResponse = await mediator.Send(new LoginUserCommandHandler
         {
             Username = request.Username,
             Password = request.Password
