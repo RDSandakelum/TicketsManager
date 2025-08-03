@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TicketsManager.Common.Dto;
 using TicketsManager.Common.Entity;
 using TicketsManager.Common.Repository;
 
@@ -17,18 +16,9 @@ public partial class TicketsManagerDbContext : IUserRepository
             .FirstOrDefaultAsync(u => u.NormalizedEmail.Equals(email.ToUpperInvariant()));
     }
 
-    public async Task<UserDto> GetUserById(Guid id)
+    public async Task<UserEntity> GetUserById(Guid id)
     {
-        return await (from u in Users
-               where u.UserId == id
-               select new UserDto
-               {
-                   UserId = u.UserId,
-                   Username = u.Username,
-                   FirstName = u.FirstName,
-                   Email = u.Email,
-                   LastName = u.LastName
-               }).FirstOrDefaultAsync();
+        return await Users.FirstOrDefaultAsync(u => u.UserId == id);
     }
 
     public Task<UserEntity?> GetUserByUsername(string username)
@@ -36,4 +26,5 @@ public partial class TicketsManagerDbContext : IUserRepository
         return Users
             .FirstOrDefaultAsync(u => u.NormalizedUsername.Equals(username.ToLower()));
     }
+
 }

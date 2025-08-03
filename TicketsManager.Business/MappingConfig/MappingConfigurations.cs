@@ -9,6 +9,7 @@ namespace TicketsManager.Business.MappingConfig
         public MappingConfigurations() 
         {
             CreateMap<UserEntity, UserDto>();
+            CreateMap<UserEntity, LoginUserResponseDto>();
         }
     }
 }

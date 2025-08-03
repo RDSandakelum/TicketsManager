@@ -1,8 +1,8 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
 using TicketsManager.Business.Repository;
 using TicketsManager.Common.Database;
 using TicketsManager.Common.Dto;
-using TicketsManager.Common.Repository;
 using TicketsManager.Common.Services.Definitions;
 
 namespace TicketsManager.Business.Actions.Users;
@@ -24,9 +24,11 @@ public class CreateUserCommandResponse
 public class CreateUserCommandHandler : RepositoryAccess, IRequestHandler<CreateUserCommand, CreateUserCommandResponse>
 {
     private readonly IPasswordService passwordService;
-    public CreateUserCommandHandler(ITicketsManagerDbContext ticketsManagerDbContext, IPasswordService passwordService) : base(ticketsManagerDbContext)
+    private readonly IMapper mapper;
+    public CreateUserCommandHandler(ITicketsManagerDbContext ticketsManagerDbContext, IPasswordService passwordService, IMapper mapper) : base(ticketsManagerDbContext)
     {
         this.passwordService = passwordService;
+        this.mapper = mapper;
     }
 
     public async Task<CreateUserCommandResponse> Handle(CreateUserCommand request, CancellationToken cancellationToken)
@@ -55,9 +57,11 @@ public class CreateUserCommandHandler : RepositoryAccess, IRequestHandler<Create
 
             await unitOfWork.SaveChangesAsync();
 
+            var userEntity = await userRepository.GetUserById(newUser.UserId);
+
             return new CreateUserCommandResponse
             {
-                User = await userRepository.GetUserById(newUser.UserId)
+                User = mapper.Map<UserDto>(userEntity)
             };
         }
         else

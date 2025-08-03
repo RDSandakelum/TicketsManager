@@ -1,10 +1,8 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 using TicketsManager.API.Request;
 using TicketsManager.Business.Actions.Users;
-using TicketsManager.Common.Dto;
 
 namespace TicketsManager.API.Controllers;
 [Route("api/[controller]")]
@@ -36,7 +34,7 @@ public class UserController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> LoginUser([FromBody] LoginUserRequest request)
     {
-        var loginResponse = await mediator.Send(new LoginUserCommandHandler
+        var loginResponse = await mediator.Send(new LoginUserCommand
         {
             Username = request.Username,
             Password = request.Password
@@ -45,6 +43,34 @@ public class UserController : ControllerBase
         {
             return Unauthorized();
         }
-        return Ok(loginResponse.User);
+        return Ok(loginResponse);
+    }
+
+    [HttpPost("token-refresh")]
+    public async Task<IActionResult> AccessTokenRefresh([FromBody] TokenRefreshRequest request)
+    {
+        var refreshTokenResponse = await mediator.Send(new AccessTokenRefreshCommand
+        {
+            userId = request.UserId,
+            RefreshToken = request.RefreshToken
+        });
+        if (refreshTokenResponse == null)
+        {
+            return BadRequest("Invalid refresh token or user not found.");
+        }
+        return Ok(refreshTokenResponse);
+    }
+
+    [Authorize]
+    [HttpGet("{userId}")]
+    public async Task<IActionResult> GetUserById(Guid userId)
+    {
+        var queryResponse = await mediator.Send(new GetUserByIdQuery { UserId = userId });
+
+        if (queryResponse == null)
+        {
+            return NotFound();
+        }
+        return Ok(queryResponse.UserDto);
     }
 }
