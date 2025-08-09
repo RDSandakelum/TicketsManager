@@ -46,6 +46,19 @@ public class UserController : ControllerBase
         return Ok(loginResponse);
     }
 
+    [Authorize]
+    [HttpGet("{userId}")]
+    public async Task<IActionResult> GetUserById(Guid userId)
+    {
+        var queryResponse = await mediator.Send(new GetUserByIdQuery { UserId = userId });
+
+        if (queryResponse == null)
+        {
+            return NotFound();
+        }
+        return Ok(queryResponse.UserDto);
+    }
+
     [HttpPost("token-refresh")]
     public async Task<IActionResult> AccessTokenRefresh([FromBody] TokenRefreshRequest request)
     {
@@ -62,16 +75,17 @@ public class UserController : ControllerBase
     }
 
     [Authorize]
-    [HttpGet("{userId}")]
-    public async Task<IActionResult> GetUserById(Guid userId)
+    [HttpPost("logout/{userId}")]
+    public async Task<IActionResult> LogoutUser(Guid userId)
     {
-        var queryResponse = await mediator.Send(new GetUserByIdQuery { UserId = userId });
+        var logoutResponse = await mediator.Send(new LogoutUserCommand { UserId = userId });
 
-        if (queryResponse == null)
+        if (!logoutResponse.IsSuccess)
         {
-            return NotFound();
+            return BadRequest(logoutResponse.Message);
         }
-        return Ok(queryResponse.UserDto);
+
+        return Ok(logoutResponse);
     }
 
     [Authorize]
