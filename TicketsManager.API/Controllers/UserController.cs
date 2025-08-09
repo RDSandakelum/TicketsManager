@@ -73,4 +73,23 @@ public class UserController : ControllerBase
         }
         return Ok(queryResponse.UserDto);
     }
+
+    [Authorize]
+    [HttpPost("update-user")]
+    public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequest request)
+    {
+        var updateUserResponse = await mediator.Send(new UpdateUserCommand
+        {
+            UserId = request.UserId,
+            Email = request.Email,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            Username = request.Username
+        });
+
+        if (updateUserResponse == null)
+            return NotFound("User not found.");
+
+        return Ok(updateUserResponse.User);
+    }
 }

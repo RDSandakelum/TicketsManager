@@ -4,52 +4,51 @@ using TicketsManager.Business.Services;
 using TicketsManager.Common.Database;
 using TicketsManager.Common.Types;
 
-namespace TicketsManager.Business.Actions.Users
+namespace TicketsManager.Business.Actions.Users;
+
+public class AccessTokenRefreshCommand : IRequest<AccessTokenRefreshCommandResponse>
 {
-    public class AccessTokenRefreshCommand : IRequest<AccessTokenRefreshCommandResponse>
+    public Guid userId { get; set; } 
+    public string RefreshToken { get; set; }
+}
+public class AccessTokenRefreshCommandResponse
+{
+    public string AccessToken { get; set; } = string.Empty;
+    public string RefreshToken { get; set; } = string.Empty;
+}
+public class AccessTokenRefreshCommandHandler : RepositoryAccess,IRequestHandler<AccessTokenRefreshCommand, AccessTokenRefreshCommandResponse>
+{
+    private readonly TokenService tokenService;
+    public AccessTokenRefreshCommandHandler(TokenService tokenService, ITicketsManagerDbContext ticketsManagerDbContext) : base(ticketsManagerDbContext)
     {
-        public Guid userId { get; set; } 
-        public string RefreshToken { get; set; }
+        this.tokenService = tokenService;
     }
-    public class AccessTokenRefreshCommandResponse
+
+    public async Task<AccessTokenRefreshCommandResponse> Handle(AccessTokenRefreshCommand request, CancellationToken cancellationToken)
     {
-        public string AccessToken { get; set; } = string.Empty;
-        public string RefreshToken { get; set; } = string.Empty;
-    }
-    public class AccessTokenRefreshCommandHandler : RepositoryAccess,IRequestHandler<AccessTokenRefreshCommand, AccessTokenRefreshCommandResponse>
-    {
-        private readonly TokenService tokenService;
-        public AccessTokenRefreshCommandHandler(TokenService tokenService, ITicketsManagerDbContext ticketsManagerDbContext) : base(ticketsManagerDbContext)
+        var existingUser = await userRepository.GetUserById(request.userId);
+
+        if (existingUser == null)
         {
-            this.tokenService = tokenService;
+            return null;
         }
 
-        public async Task<AccessTokenRefreshCommandResponse> Handle(AccessTokenRefreshCommand request, CancellationToken cancellationToken)
+        if (existingUser.RefreshToken != request.RefreshToken || existingUser.RefreshTokenExpiry < DateTimeOffset.UtcNow)
         {
-            var existingUser = await userRepository.GetUserById(request.userId);
-
-            if (existingUser == null)
-            {
-                return null;
-            }
-
-            if (existingUser.RefreshToken != request.RefreshToken || existingUser.RefreshTokenExpiry < DateTimeOffset.UtcNow)
-            {
-                return null;
-            }
-
-            Tokens tokens = tokenService.GenerateTokens(existingUser);
-
-            existingUser.RefreshToken = tokens.RefreshToken;
-            existingUser.RefreshTokenExpiry = DateTimeOffset.UtcNow.AddDays(7);
-
-            await unitOfWork.SaveChangesAsync();
-
-            return new AccessTokenRefreshCommandResponse()
-            {
-                AccessToken = tokens.AccessToken,
-                RefreshToken = tokens.RefreshToken
-            };
+            return null;
         }
+
+        Tokens tokens = tokenService.GenerateTokens(existingUser);
+
+        existingUser.RefreshToken = tokens.RefreshToken;
+        existingUser.RefreshTokenExpiry = DateTimeOffset.UtcNow.AddDays(7);
+
+        await unitOfWork.SaveChangesAsync();
+
+        return new AccessTokenRefreshCommandResponse()
+        {
+            AccessToken = tokens.AccessToken,
+            RefreshToken = tokens.RefreshToken
+        };
     }
 }

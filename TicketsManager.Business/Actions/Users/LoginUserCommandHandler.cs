@@ -7,61 +7,60 @@ using TicketsManager.Common.Dto;
 using TicketsManager.Common.Services.Definitions;
 using TicketsManager.Common.Types;
 
-namespace TicketsManager.Business.Actions.Users
+namespace TicketsManager.Business.Actions.Users;
+
+public class LoginUserCommand : IRequest<LoginUserCommandResponse>
 {
-    public class LoginUserCommand : IRequest<LoginUserCommandResponse>
+    public string Username { get; set; }
+    public string Password { get; set; }
+}
+
+public class LoginUserCommandResponse
+{
+    public LoginUserResponseDto User { get; set; }
+    public string AccessToken { get; set; }
+    public string RefreshToken { get; set; }
+}
+
+public class LoginUserCommandHandler : RepositoryAccess,IRequestHandler<LoginUserCommand, LoginUserCommandResponse>
+{
+    private readonly IPasswordService passwordService;
+    private readonly IMapper mapper;
+    private readonly TokenService tokenService;
+    public LoginUserCommandHandler(ITicketsManagerDbContext ticketsManagerDbContext, IPasswordService passwordService, IMapper mapper, TokenService tokenService) : base(ticketsManagerDbContext)
     {
-        public string Username { get; set; }
-        public string Password { get; set; }
+        this.passwordService = passwordService;
+        this.mapper = mapper;
+        this.tokenService = tokenService;
     }
-
-    public class LoginUserCommandResponse
+    public async Task<LoginUserCommandResponse> Handle(LoginUserCommand request, CancellationToken cancellationToken)
     {
-        public LoginUserResponseDto User { get; set; }
-        public string AccessToken { get; set; }
-        public string RefreshToken { get; set; }
-    }
+        var existingUser = await userRepository.GetUserByUsername(request.Username);
 
-    public class LoginUserCommandHandler : RepositoryAccess,IRequestHandler<LoginUserCommand, LoginUserCommandResponse>
-    {
-        private readonly IPasswordService passwordService;
-        private readonly IMapper mapper;
-        private readonly TokenService tokenService;
-        public LoginUserCommandHandler(ITicketsManagerDbContext ticketsManagerDbContext, IPasswordService passwordService, IMapper mapper, TokenService tokenService) : base(ticketsManagerDbContext)
+        if (existingUser == null)
         {
-            this.passwordService = passwordService;
-            this.mapper = mapper;
-            this.tokenService = tokenService;
-        }
-        public async Task<LoginUserCommandResponse> Handle(LoginUserCommand request, CancellationToken cancellationToken)
-        {
-            var existingUser = await userRepository.GetUserByUsername(request.Username);
-
-            if (existingUser == null)
-            {
-                return null;
-            }
-
-            var isPasswordValid = passwordService.VerifyPassword(request.Password, existingUser.PasswordHash, existingUser.PasswordSalt);
-
-            if (isPasswordValid)
-            {
-                Tokens tokens = tokenService.GenerateTokens(existingUser);
-
-                existingUser.RefreshToken = tokens.RefreshToken;
-                existingUser.RefreshTokenExpiry = DateTimeOffset.UtcNow.AddDays(7);
-
-                await unitOfWork.SaveChangesAsync();
-
-                return new LoginUserCommandResponse()
-                {
-                    User = mapper.Map<LoginUserResponseDto>(existingUser),
-                    AccessToken = tokens.AccessToken,
-                    RefreshToken = tokens.RefreshToken
-                };
-            }
-
             return null;
         }
+
+        var isPasswordValid = passwordService.VerifyPassword(request.Password, existingUser.PasswordHash, existingUser.PasswordSalt);
+
+        if (isPasswordValid)
+        {
+            Tokens tokens = tokenService.GenerateTokens(existingUser);
+
+            existingUser.RefreshToken = tokens.RefreshToken;
+            existingUser.RefreshTokenExpiry = DateTimeOffset.UtcNow.AddDays(7);
+
+            await unitOfWork.SaveChangesAsync();
+
+            return new LoginUserCommandResponse()
+            {
+                User = mapper.Map<LoginUserResponseDto>(existingUser),
+                AccessToken = tokens.AccessToken,
+                RefreshToken = tokens.RefreshToken
+            };
+        }
+
+        return null;
     }
 }
