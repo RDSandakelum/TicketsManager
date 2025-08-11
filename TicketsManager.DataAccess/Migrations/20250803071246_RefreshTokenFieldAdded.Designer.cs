@@ -7,14 +7,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TicketsManager.DataAccess.EFCustomizations;
 
-
 #nullable disable
 
 namespace TicketsManager.DataAccess.Migrations
 {
     [DbContext(typeof(TicketsManagerDbContext))]
-    [Migration("20250714093406_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20250803071246_RefreshTokenFieldAdded")]
+    partial class RefreshTokenFieldAdded
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -246,6 +245,13 @@ namespace TicketsManager.DataAccess.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<string>("RefreshToken")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTimeOffset>("RefreshTokenExpiry")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -259,7 +265,7 @@ namespace TicketsManager.DataAccess.Migrations
                     b.HasIndex("NormalizedUsername")
                         .IsUnique();
 
-                    b.ToTable("UserEntities");
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("TicketsManager.Common.Entity.BudgetAllocationEntity", b =>

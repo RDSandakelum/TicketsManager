@@ -16,6 +16,8 @@ public class UserEntity
     public string NormalizedEmail { get; set; }
     public string PasswordHash { get; set; }    
     public string PasswordSalt { get; set; }
+    public string RefreshToken { get; set; }
+    public DateTimeOffset RefreshTokenExpiry { get; set; }
     public ICollection<BudgetTemplateEntity> BudgetTemplates { get; set; }
     public ICollection<BudgetEntity> Budgets { get; set; }
     public ICollection<ExpenseEntity> Expenses { get; set; }

@@ -60,5 +60,10 @@ internal class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
             .WithOne(e => e.User)
             .HasForeignKey(e => e.UserId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property(u => u.RefreshToken)
+            .HasMaxLength(500)
+            .IsRequired(false);
+
     }
 }
