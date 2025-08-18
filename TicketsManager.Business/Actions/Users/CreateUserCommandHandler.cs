@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using MediatR;
 using TicketsManager.Business.Repository;
 using TicketsManager.Common.Database;
@@ -25,14 +26,24 @@ public class CreateUserCommandHandler : RepositoryAccess, IRequestHandler<Create
 {
     private readonly IPasswordService passwordService;
     private readonly IMapper mapper;
-    public CreateUserCommandHandler(ITicketsManagerDbContext ticketsManagerDbContext, IPasswordService passwordService, IMapper mapper) : base(ticketsManagerDbContext)
+    private readonly IValidator<CreateUserCommand> commandValidator;
+
+    public CreateUserCommandHandler(ITicketsManagerDbContext ticketsManagerDbContext, IPasswordService passwordService, IMapper mapper, IValidator<CreateUserCommand> commandValidator) : base(ticketsManagerDbContext)
     {
         this.passwordService = passwordService;
         this.mapper = mapper;
+        this.commandValidator = commandValidator;
     }
 
     public async Task<CreateUserCommandResponse> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
+        var validationResult = commandValidator.Validate(request);
+
+        if (!validationResult.IsValid)
+        {
+            throw new ValidationException(validationResult.Errors);
+        }
+
         var existingUser = await userRepository.GetUserByUsername(request.Username);
 
         if (existingUser == null)
