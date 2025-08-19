@@ -11,58 +11,68 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using FluentValidation;
 using TicketsManager.Business.Validators.Users;
+using TicketsManager.API.ExtentionsForStartup;
 
-var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddControllers();
-
-var services = builder.Services;
-
-services.AddDbContext<TicketsManagerDbContext>(options =>
+internal class Program
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("TicketsManagerDbConnectionString"));
-});
-
-services.AddScoped<ITicketsManagerDbContext, TicketsManagerDbContext>();
-
-services.AddValidatorsFromAssembly(typeof(CreateUserCommandValidator).Assembly, includeInternalTypes : true);
-
-services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+    private static void Main(string[] args)
     {
-        options.TokenValidationParameters = new TokenValidationParameters
+        var builder = WebApplication.CreateBuilder(args);
+
+        builder.Services.AddControllers();
+
+        var services = builder.Services;
+
+        services.AddDbContext<TicketsManagerDbContext>(options =>
         {
-            ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["JWTSettings:Issuer"],
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["JWTSettings:Audience"],
-            ValidateLifetime = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWTSettings:Key"]!)),
-            ValidateIssuerSigningKey = true,
-            ClockSkew = TimeSpan.Zero
-        };
-    });
+            options.UseSqlServer(builder.Configuration.GetConnectionString("TicketsManagerDbConnectionString"));
+        });
 
-services.AddAutoMapper(cfg =>
-{
-    cfg.AddProfile<MappingConfigurations>();
-});
+        services.AddScoped<ITicketsManagerDbContext, TicketsManagerDbContext>();
 
-services.Configure<JWTSettings>(builder.Configuration.GetSection("JWTSettings"));
-services.AddScoped<TokenService>();
+        services.AddValidatorsFromAssembly(typeof(CreateUserCommandValidator).Assembly, includeInternalTypes: true);
 
-services.AddMediatR(configurations =>
-{
-    configurations.RegisterServicesFromAssembly(typeof(CreateUserCommandHandler).Assembly);
-});
+        //services.AddCustomExceptionsHandlers();
+        services.AddCustomExceptionsHandlers();
 
-services.AddScoped<IPasswordService, PasswordService>();
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = builder.Configuration["JWTSettings:Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = builder.Configuration["JWTSettings:Audience"],
+                    ValidateLifetime = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWTSettings:Key"]!)),
+                    ValidateIssuerSigningKey = true,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
 
-var app = builder.Build();
+        services.AddAutoMapper(cfg =>
+        {
+            cfg.AddProfile<MappingConfigurations>();
+        });
 
-app.UseHttpsRedirection();
-app.UseAuthorization();
-app.MapControllers();
+        services.Configure<JWTSettings>(builder.Configuration.GetSection("JWTSettings"));
+        services.AddScoped<TokenService>();
 
-app.Run();
+        services.AddMediatR(configurations =>
+        {
+            configurations.RegisterServicesFromAssembly(typeof(CreateUserCommandHandler).Assembly);
+        });
 
+        services.AddScoped<IPasswordService, PasswordService>();
+
+        var app = builder.Build();
+
+        app.UseExceptionHandler(option => { });
+        app.UseHttpsRedirection();
+        app.UseAuthorization();
+        app.MapControllers();
+
+        app.Run();
+    }
+}

@@ -1,6 +1,8 @@
-﻿using AutoMapper;
+﻿using System.Text.Json;
+using AutoMapper;
 using FluentValidation;
 using MediatR;
+using TicketsManager.Business.Exceptions;
 using TicketsManager.Business.Repository;
 using TicketsManager.Common.Database;
 using TicketsManager.Common.Dto;
@@ -41,7 +43,7 @@ public class CreateUserCommandHandler : RepositoryAccess, IRequestHandler<Create
 
         if (!validationResult.IsValid)
         {
-            throw new ValidationException(validationResult.Errors);
+            throw new CommandValidationExeption(JsonSerializer.Serialize(validationResult.ToDictionary()));
         }
 
         var existingUser = await userRepository.GetUserByUsername(request.Username);
