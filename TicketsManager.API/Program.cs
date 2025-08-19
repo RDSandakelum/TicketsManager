@@ -32,7 +32,6 @@ internal class Program
 
         services.AddValidatorsFromAssembly(typeof(CreateUserCommandValidator).Assembly, includeInternalTypes: true);
 
-        //services.AddCustomExceptionsHandlers();
         services.AddCustomExceptionsHandlers();
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

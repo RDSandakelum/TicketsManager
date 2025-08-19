@@ -6,6 +6,7 @@ public static class StartupExtentions
 {
     public static IServiceCollection AddCustomExceptionsHandlers(this IServiceCollection services)
     {
+        services.AddExceptionHandler<InvalidCredentialsExceptionHandler>();
         services.AddExceptionHandler<CommandValidationExceptionHandler>();
         services.AddExceptionHandler<GlobalExceptionHandler>();
 
