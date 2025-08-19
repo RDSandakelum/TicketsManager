@@ -9,6 +9,8 @@ using TicketsManager.DataAccess.EFCustomizations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using FluentValidation;
+using TicketsManager.Business.Validators.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,8 +23,9 @@ services.AddDbContext<TicketsManagerDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("TicketsManagerDbConnectionString"));
 });
 
-
 services.AddScoped<ITicketsManagerDbContext, TicketsManagerDbContext>();
+
+services.AddValidatorsFromAssembly(typeof(CreateUserCommandValidator).Assembly, includeInternalTypes : true);
 
 services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
