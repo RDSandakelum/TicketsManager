@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Security.Authentication;
+using AutoMapper;
 using MediatR;
 using TicketsManager.Business.Repository;
 using TicketsManager.Business.Services;
@@ -35,32 +36,24 @@ public class LoginUserCommandHandler : RepositoryAccess,IRequestHandler<LoginUse
     }
     public async Task<LoginUserCommandResponse> Handle(LoginUserCommand request, CancellationToken cancellationToken)
     {
-        var existingUser = await userRepository.GetUserByUsername(request.Username);
-
-        if (existingUser == null)
-        {
-            return null;
-        }
-
+        var existingUser = await userRepository.GetUserByUsername(request.Username) ?? throw new InvalidCredentialException("Invalid username or password.");
         var isPasswordValid = passwordService.VerifyPassword(request.Password, existingUser.PasswordHash, existingUser.PasswordSalt);
 
-        if (isPasswordValid)
+        if (!isPasswordValid)
+            throw new InvalidCredentialException("Invalid username or password.");
+
+        Tokens tokens = tokenService.GenerateTokens(existingUser);
+
+        existingUser.RefreshToken = tokens.RefreshToken;
+        existingUser.RefreshTokenExpiry = DateTimeOffset.UtcNow.AddDays(7);
+
+        await unitOfWork.SaveChangesAsync();
+
+        return new LoginUserCommandResponse()
         {
-            Tokens tokens = tokenService.GenerateTokens(existingUser);
-
-            existingUser.RefreshToken = tokens.RefreshToken;
-            existingUser.RefreshTokenExpiry = DateTimeOffset.UtcNow.AddDays(7);
-
-            await unitOfWork.SaveChangesAsync();
-
-            return new LoginUserCommandResponse()
-            {
-                User = mapper.Map<LoginUserResponseDto>(existingUser),
-                AccessToken = tokens.AccessToken,
-                RefreshToken = tokens.RefreshToken
-            };
-        }
-
-        return null;
+            User = mapper.Map<LoginUserResponseDto>(existingUser),
+            AccessToken = tokens.AccessToken,
+            RefreshToken = tokens.RefreshToken
+        };
     }
 }
